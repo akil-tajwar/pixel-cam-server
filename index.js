@@ -8,7 +8,7 @@ app.use(cors());
 app.use(express.json());
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.fdbahux.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -25,16 +25,37 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
-    const classesCollection = client.db('pixelcamDB').collection('classes');  
+    const classesCollection = client.db('pixelcamDB').collection('classes');
+    const instructorsCollection = client.db('pixelcamDB').collection('instructors');
+    const selectClassCollection = client.db('pixelcamDB').collection('selectClass');
+    
+    app.post('/selectClass', async(req, res) => {
+      const selectClass = req.body;
+      console.log(selectClass);
+      const result = await selectClassCollection.insertOne(selectClass);
+      res.send(result);
+    })
+
     app.get('/classes', async(req, res) => {
         const result = await classesCollection.find().toArray();
         res.send(result);
     })
 
-    const instructorsCollection = client.db('pixelcamDB').collection('instructors');
+    app.get('/selectClass', async(req, res) => {
+        const result = await selectClassCollection.find().toArray();
+        res.send(result);
+    })
+
     app.get('/instructors', async(req, res) => {
       const result = await instructorsCollection.find().toArray();
       res.send(result);
+  })
+
+  app.delete('/selectClass/:id', async (req, res) => {
+    const id = req.params.id;
+    const querry = { _id: new ObjectId(id) };
+    const result = await selectClassCollection.deleteOne(querry);
+    res.send(result);
   })
 
     // Send a ping to confirm a successful connection
