@@ -23,40 +23,47 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
 
     const classesCollection = client.db('pixelcamDB').collection('classes');
     const instructorsCollection = client.db('pixelcamDB').collection('instructors');
     const selectClassCollection = client.db('pixelcamDB').collection('selectClass');
-    
-    app.post('/selectClass', async(req, res) => {
+
+    app.post('/selectClass', async (req, res) => {
       const selectClass = req.body;
       console.log(selectClass);
       const result = await selectClassCollection.insertOne(selectClass);
       res.send(result);
     })
 
-    app.get('/classes', async(req, res) => {
-        const result = await classesCollection.find().toArray();
-        res.send(result);
+    app.get('/classes', async (req, res) => {
+      const result = await classesCollection.find().toArray();
+      res.send(result);
     })
 
+    // app.get('/selectClass', async (req, res) => {
+    //   const { email } = req.query;
+    //   console.log(email);
+    //   const result = await selectClassCollection.find({ "user.email": email }).toArray();
+    //   console.log(result);
+    //   res.send(result);
+    // });
     app.get('/selectClass', async(req, res) => {
         const result = await selectClassCollection.find().toArray();
         res.send(result);
     })
 
-    app.get('/instructors', async(req, res) => {
+    app.get('/instructors', async (req, res) => {
       const result = await instructorsCollection.find().toArray();
       res.send(result);
-  })
+    })
 
-  app.delete('/selectClass/:id', async (req, res) => {
-    const id = req.params.id;
-    const querry = { _id: new ObjectId(id) };
-    const result = await selectClassCollection.deleteOne(querry);
-    res.send(result);
-  })
+    app.delete('/selectClass/:id', async (req, res) => {
+      const id = req.params.id;
+      const querry = { _id: new ObjectId(id) };
+      const result = await selectClassCollection.deleteOne(querry);
+      res.send(result);
+    })
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
@@ -69,10 +76,10 @@ async function run() {
 run().catch(console.dir);
 
 
-app.get('/',(req,res) => {
-    res.send('pixelcam is taking picture');
+app.get('/', (req, res) => {
+  res.send('pixelcam is taking picture');
 })
 
-app.listen(port, ()=> {
-    console.log(`pixel is taking picture of ${port}`);
+app.listen(port, () => {
+  console.log(`pixel is taking picture of ${port}`);
 })
